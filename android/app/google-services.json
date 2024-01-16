@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "1021462800837",
+    "project_id": "mobileproject-823e9",
+    "storage_bucket": "mobileproject-823e9.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1021462800837:android:3697929fae386cddf903ac",
+        "android_client_info": {
+          "package_name": "com.example.twitty"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyACOmw2P2VpcPujF2Th5JuxBUk-2usDhcU"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
