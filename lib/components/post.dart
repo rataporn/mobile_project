@@ -214,7 +214,7 @@ class _PostState extends State<Post> {
                   .collection("User Posts")
                   .doc(widget.postId)
                   .collection("Comments")
-                  .orderBy("CommentTime", descending: true)
+                  .orderBy("CommentTime")
                   .snapshots(),
               builder: (context, snapshot) {
                 // show loading circle if no data yet

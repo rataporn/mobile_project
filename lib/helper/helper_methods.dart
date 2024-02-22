@@ -8,19 +8,19 @@ String formatDate(Timestamp timestamp) {
   DateTime dateTime = timestamp.toDate();
 
   // get year
-  String year = dateTime.year.toString();
+  String year = dateTime.year.toString().padLeft(2, '0');
 
   // get month
-  String month = dateTime.month.toString();
+  String month = dateTime.month.toString().padLeft(2, '0');
 
   // get day
-  String day = dateTime.day.toString();
+  String day = dateTime.day.toString().padLeft(2, '0');
 
   // get hour
-  String hour = dateTime.hour.toString();
+  String hour = dateTime.hour.toString().padLeft(2, '0');
 
   // get mintues
-  String minute = dateTime.minute.toString();
+  String minute = dateTime.minute.toString().padLeft(2, '0');
 
   // final formatted date
   String formattedDate = '$day/$month/$year $hour:$minute';
