@@ -79,7 +79,8 @@ class _HomePageState extends State<HomePage> {
                           message: post['Message'],
                           user: post['UserEmail'],
                           postId: post.id,
-                          likes: List<String>.from(post['Likes'] ?? []) ,
+                          likes: List<String>.from(post['Likes'] ?? []),
+                          time: post['TimeStamp'],
                         );
                       },
                     );
