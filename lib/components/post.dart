@@ -1,16 +1,59 @@
-// ignore_for_file: prefer_const_constructors
+// ignore_for_file: prefer_const_constructors, prefer_const_literals_to_create_immutables
 
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:twitty/components/like_button.dart';
 
-class Post extends StatelessWidget {
+class Post extends StatefulWidget {
   final String message;
   final String user;
+  final String postId;
+  final List<String> likes;
 
-  const Post({
-    super.key,
-    required this.message,
-    required this.user,
-  });
+  const Post(
+      {super.key,
+      required this.message,
+      required this.user,
+      required this.postId,
+      required this.likes});
+
+  @override
+  State<Post> createState() => _PostState();
+}
+
+class _PostState extends State<Post> {
+  //user
+  final currentUser = FirebaseAuth.instance.currentUser!;
+  bool isLiked = false;
+
+  @override
+  void initState() {
+    super.initState();
+    isLiked = widget.likes.contains(currentUser.email);
+  }
+
+  void toggleLiked() {
+    setState(() {
+      isLiked = !isLiked;
+    });
+
+    //Access the Document is Firebase
+    DocumentReference postRef =
+        FirebaseFirestore.instance.collection('User Posts').doc(widget.postId);
+
+    if (isLiked) {
+      // if the post is now liked, add the user email to Liked field
+      postRef.update({
+        'Likes': FieldValue.arrayUnion([currentUser.email])
+      });
+    } else {
+      // if the post is now unliked, remove the user email from Liked field
+      postRef.update({
+        'Likes': FieldValue.arrayRemove([currentUser.email])
+      });
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -23,6 +66,26 @@ class Post extends StatelessWidget {
       padding: EdgeInsets.all(25),
       child: Row(
         children: [
+          Column(
+            children: [
+              // Like Button
+              LikeButton(
+                isLiked: isLiked,
+                onTap: toggleLiked,
+              ),
+              const SizedBox(
+                height: 5,
+              ),
+              // Like count
+              Text(
+                widget.likes.length.toString(),
+                style: TextStyle(color: Colors.grey),
+              )
+            ],
+          ),
+          const SizedBox(
+            width: 10,
+          ),
           // profile pic
           Container(
             decoration:
@@ -37,11 +100,11 @@ class Post extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                user,
+                widget.user,
                 style: TextStyle(color: Colors.blue[500]),
               ),
               const SizedBox(height: 10),
-              Text(message),
+              Text(widget.message),
             ],
           ),
         ],
