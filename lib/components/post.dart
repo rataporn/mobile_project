@@ -147,9 +147,11 @@ class _PostState extends State<Post> {
                 ),
                 const SizedBox(width: 20),
                 // user
-                Text(
-                  widget.user,
-                  style: TextStyle(color: Colors.blue[500]),
+                Expanded(
+                  child: Text(
+                    widget.user,
+                    style: TextStyle(color: Colors.blue[500]),
+                  ),
                 ),
                 const SizedBox(width: 5),
                 Text(
@@ -199,7 +201,7 @@ class _PostState extends State<Post> {
                 // comment count
                 Text(
                   // widget.comments.length.toString(),
-                  '0',
+                  '3',
                   style: TextStyle(color: Colors.grey),
                 ),
               ],

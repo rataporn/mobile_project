@@ -29,9 +29,11 @@ class Comment extends StatelessWidget {
           // user, time
           Row(
             children: [
-              Text(
-                user,
-                style: TextStyle(color: Colors.blue[500], fontSize: 12),
+              Expanded(
+                child: Text(
+                  user,
+                  style: TextStyle(color: Colors.blue[500], fontSize: 12),
+                ),
               ),
               Text("  "),
               Text(
