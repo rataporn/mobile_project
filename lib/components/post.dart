@@ -122,6 +122,7 @@ class _PostState extends State<Post> {
     );
   }
 
+  // Delete Post
   void deletePost() {
     // show a dialog box asking for confirmation brfore delete
     showDialog(
