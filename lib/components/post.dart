@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:twitty/components/comment.dart';
 import 'package:twitty/components/comment_button.dart';
 import 'package:twitty/components/delete_button.dart';
+import 'package:twitty/components/edit_button.dart';
 import 'package:twitty/components/like_button.dart';
 import 'package:twitty/helper/helper_methods.dart';
 
@@ -175,6 +176,64 @@ class _PostState extends State<Post> {
     );
   }
 
+  // Edit Post
+  void editPost(String currentMessage) {
+    // Controller to handle the edited post message
+    TextEditingController _editedMessageController =
+        TextEditingController(text: currentMessage);
+
+    // Show a dialog with a text field for editing the post message
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text("Edit Post"),
+        contentPadding: EdgeInsets.all(16.0),
+        content: Container(
+          width: 400.0, // Set the width as needed
+          child: TextField(
+            controller: _editedMessageController,
+            maxLines: null, // Allow the TextField to expand vertically
+            decoration: InputDecoration(hintText: "Edit your post..."),
+          ),
+        ),
+        actions: [
+          // Cancel button
+          TextButton(
+            onPressed: () {
+              // Dismiss the dialog
+              Navigator.pop(context);
+            },
+            child: Text("Cancel"),
+          ),
+
+          // Save changes button
+          TextButton(
+            onPressed: () {
+              // Perform the post edit action
+              // For example, update the post message in Firestore
+              if (_editedMessageController.text.isNotEmpty) {
+                FirebaseFirestore.instance
+                    .collection("User Posts")
+                    .doc(widget.postId)
+                    .update({
+                  "message": _editedMessageController.text,
+                }).then((value) {
+                  print("Post edited successfully");
+                }).catchError((error) {
+                  print("Failed to edit post: $error");
+                });
+              }
+
+              // Dismiss the dialog
+              Navigator.pop(context);
+            },
+            child: Text("Save Changes"),
+          ),
+        ],
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return SingleChildScrollView(
@@ -216,6 +275,10 @@ class _PostState extends State<Post> {
                     ),
                     const SizedBox(height: 10),
                     const SizedBox(width: 10),
+                    if (widget.user == currentUser.email)
+                      EditButton(
+                        onTap: () => editPost(widget.message),
+                      ),
                     if (widget.user == currentUser.email)
                       DeleteButton(onTap: deletePost)
                   ],
@@ -260,15 +323,28 @@ class _PostState extends State<Post> {
                   width: 5,
                 ),
                 // comment count
-                Text(
-                  // widget.comments.length.toString(),
-                  '3',
-                  style: TextStyle(color: Colors.grey),
+                StreamBuilder<QuerySnapshot>(
+                  stream: FirebaseFirestore.instance
+                      .collection("User Posts")
+                      .doc(widget.postId)
+                      .collection("Comments")
+                      .snapshots(),
+                  builder: (context, snapshot) {
+                    // show loading circle if no data yet
+                    if (!snapshot.hasData) {
+                      return Text(
+                        '0', // Default to 0 if no comments yet
+                        style: TextStyle(color: Colors.grey),
+                      );
+                    }
+
+                    return Text(
+                      snapshot.data!.docs.length.toString(),
+                      style: TextStyle(color: Colors.grey),
+                    );
+                  },
                 ),
               ],
-            ),
-            const SizedBox(
-              height: 10,
             ),
 
             // comments under post
@@ -286,6 +362,7 @@ class _PostState extends State<Post> {
                     child: CircularProgressIndicator(),
                   );
                 }
+
                 return ListView(
                   shrinkWrap: true,
                   physics: const NeverScrollableScrollPhysics(),
