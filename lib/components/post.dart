@@ -5,6 +5,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:twitty/components/comment.dart';
 import 'package:twitty/components/comment_button.dart';
+import 'package:twitty/components/delete_button.dart';
 import 'package:twitty/components/like_button.dart';
 import 'package:twitty/helper/helper_methods.dart';
 
@@ -121,6 +122,58 @@ class _PostState extends State<Post> {
     );
   }
 
+  void deletePost() {
+    // show a dialog box asking for confirmation brfore delete
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text("Delete Post"),
+        content: const Text("Are you sure you want to delete this post?"),
+        actions: [
+          // Cancel Button
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text("Cancel"),
+          ),
+
+          // Delete Button
+          TextButton(
+            onPressed: () async {
+              // delete the comment from firestore
+              // if you only delete the post, the comment will store in firestore
+              final commentDocs = await FirebaseFirestore.instance
+                  .collection("User Posts")
+                  .doc(widget.postId)
+                  .collection("Comments")
+                  .get();
+
+              for (var doc in commentDocs.docs) {
+                await FirebaseFirestore.instance
+                    .collection("User Posts")
+                    .doc(widget.postId)
+                    .collection("Comments")
+                    .doc(doc.id)
+                    .delete();
+              }
+              // then delete the post
+              FirebaseFirestore.instance
+                  .collection("User Posts")
+                  .doc(widget.postId)
+                  .delete()
+                  .then((value) => print("Post deleted"))
+                  .catchError(
+                      (error) => print("failed to delete post: $error"));
+
+              // dissmiss the dialog
+              Navigator.pop(context);
+            },
+            child: const Text("Delete"),
+          )
+        ],
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return SingleChildScrollView(
@@ -135,30 +188,37 @@ class _PostState extends State<Post> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             // message and user email
-            Row(
-              crossAxisAlignment: CrossAxisAlignment.center,
+            Column(
               children: [
-                // profile pic
-                Container(
-                  decoration: BoxDecoration(
-                      shape: BoxShape.circle, color: Colors.blue[400]),
-                  padding: EdgeInsets.all(5),
-                  child: const Icon(Icons.person),
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    // profile pic
+                    Container(
+                      decoration: BoxDecoration(
+                          shape: BoxShape.circle, color: Colors.blue[400]),
+                      padding: EdgeInsets.all(5),
+                      child: const Icon(Icons.person),
+                    ),
+                    const SizedBox(width: 20),
+                    // user
+                    Expanded(
+                      child: Text(
+                        widget.user,
+                        style: TextStyle(color: Colors.blue[500]),
+                      ),
+                    ),
+                    const SizedBox(width: 5),
+                    Text(
+                      formatDate(widget.time),
+                      style: TextStyle(color: Colors.grey[500], fontSize: 10),
+                    ),
+                    const SizedBox(height: 10),
+                    const SizedBox(width: 10),
+                    if (widget.user == currentUser.email)
+                      DeleteButton(onTap: deletePost)
+                  ],
                 ),
-                const SizedBox(width: 20),
-                // user
-                Expanded(
-                  child: Text(
-                    widget.user,
-                    style: TextStyle(color: Colors.blue[500]),
-                  ),
-                ),
-                const SizedBox(width: 5),
-                Text(
-                  formatDate(widget.time),
-                  style: TextStyle(color: Colors.grey[500], fontSize: 10),
-                ),
-                const SizedBox(height: 10),
               ],
             ),
             Row(
