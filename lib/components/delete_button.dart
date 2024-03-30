@@ -8,12 +8,20 @@ class DeleteButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: onTap,
-      child: const Icon(
-        Icons.cancel,
-        color: Colors.grey,
-      ),
+    return Row(
+      children: [
+        GestureDetector(
+          onTap: onTap,
+          child: const Icon(
+            Icons.cancel,
+            size: 18,
+          ),
+        ),
+        SizedBox(
+          width: 5,
+        ),
+        Text('Delete Post')
+      ],
     );
   }
 }

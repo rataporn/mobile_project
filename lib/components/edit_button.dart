@@ -9,9 +9,20 @@ class EditButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return IconButton(
-      icon: Icon(Icons.edit),
-      onPressed: onTap,
+    return Row(
+      children: [
+        GestureDetector(
+          onTap: onTap,
+          child: const Icon(
+            Icons.edit,
+            size: 18,
+          ),
+        ),
+        SizedBox(
+          width: 5,
+        ),
+        Text('Edit Post')
+      ],
     );
   }
 }

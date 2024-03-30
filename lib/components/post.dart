@@ -1,8 +1,9 @@
-// ignore_for_file: prefer_const_constructors, prefer_const_literals_to_create_immutables
+// ignore_for_file: prefer_const_constructors, prefer_const_literals_to_create_immutables, no_leading_underscores_for_local_identifiers
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import 'package:twitty/components/comment.dart';
 import 'package:twitty/components/comment_button.dart';
 import 'package:twitty/components/delete_button.dart';
@@ -242,8 +243,8 @@ class _PostState extends State<Post> {
           color: Colors.white,
           borderRadius: BorderRadius.circular(8),
         ),
-        margin: EdgeInsets.only(top: 25, left: 25, right: 25),
-        padding: EdgeInsets.all(25),
+        margin: EdgeInsets.only(top: 25, left: 20, right: 20),
+        padding: EdgeInsets.all(15),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -252,6 +253,7 @@ class _PostState extends State<Post> {
               children: [
                 Row(
                   crossAxisAlignment: CrossAxisAlignment.center,
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     // profile pic
                     Container(
@@ -265,22 +267,32 @@ class _PostState extends State<Post> {
                     Expanded(
                       child: Text(
                         widget.user,
-                        style: TextStyle(color: Colors.blue[500]),
+                        style: TextStyle(color: Colors.blue[500], fontSize: 12),
                       ),
                     ),
                     const SizedBox(width: 5),
                     Text(
                       formatDate(widget.time),
-                      style: TextStyle(color: Colors.grey[500], fontSize: 10),
+                      style: TextStyle(color: Colors.grey[500], fontSize: 9),
                     ),
-                    const SizedBox(height: 10),
-                    const SizedBox(width: 10),
                     if (widget.user == currentUser.email)
-                      EditButton(
-                        onTap: () => editPost(widget.message),
+                      PopupMenuButton<String>(
+                        icon: Icon(Icons.more_vert_outlined),
+                        itemBuilder: (context) => [
+                          PopupMenuItem(
+                            child: EditButton(
+                              onTap: () {
+                                editPost(widget.message);
+                              },
+                            ),
+                          ),
+                          PopupMenuItem(child: DeleteButton(
+                            onTap: () {
+                              deletePost();
+                            },
+                          )),
+                        ],
                       ),
-                    if (widget.user == currentUser.email)
-                      DeleteButton(onTap: deletePost)
                   ],
                 ),
               ],
@@ -328,6 +340,7 @@ class _PostState extends State<Post> {
                       .collection("User Posts")
                       .doc(widget.postId)
                       .collection("Comments")
+                      .orderBy("CommentTime")
                       .snapshots(),
                   builder: (context, snapshot) {
                     // show loading circle if no data yet
@@ -345,6 +358,9 @@ class _PostState extends State<Post> {
                   },
                 ),
               ],
+            ),
+            SizedBox(
+              height: 10,
             ),
 
             // comments under post
