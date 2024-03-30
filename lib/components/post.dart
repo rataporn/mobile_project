@@ -1,9 +1,8 @@
-// ignore_for_file: prefer_const_constructors, prefer_const_literals_to_create_immutables, no_leading_underscores_for_local_identifiers
+// ignore_for_file: prefer_const_constructors, prefer_const_literals_to_create_immutables, no_leading_underscores_for_local_identifiers, avoid_print, use_build_context_synchronously, sized_box_for_whitespace
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:twitty/components/comment.dart';
 import 'package:twitty/components/comment_button.dart';
 import 'package:twitty/components/delete_button.dart';
@@ -286,7 +285,8 @@ class _PostState extends State<Post> {
                               },
                             ),
                           ),
-                          PopupMenuItem(child: DeleteButton(
+                          PopupMenuItem(
+                            child: DeleteButton(
                             onTap: () {
                               deletePost();
                             },
