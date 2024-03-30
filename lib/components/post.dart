@@ -33,6 +33,7 @@ class Post extends StatefulWidget {
 class _PostState extends State<Post> {
   //user
   final currentUser = FirebaseAuth.instance.currentUser!;
+  bool showFullMessage = false;
 
   // coment text controller
   final _commentTextController = TextEditingController();
@@ -320,7 +321,7 @@ class _PostState extends State<Post> {
           borderRadius: BorderRadius.circular(8),
         ),
         margin: EdgeInsets.only(top: 25, left: 20, right: 20),
-        padding: EdgeInsets.all(15),
+        padding: EdgeInsets.all(20),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -382,13 +383,34 @@ class _PostState extends State<Post> {
               ],
             ),
             Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 const SizedBox(
                   width: 54,
                 ),
                 Expanded(
-                  child: Text(
-                    widget.message,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        widget.message.length > 120 && !showFullMessage
+                            ? widget.message.substring(0, 120) + '...'
+                            : widget.message,
+                      ),
+                      if (widget.message.length > 120)
+                        TextButton(
+                          onPressed: () {
+                            setState(() {
+                              // Toggle the state to show or hide the full message
+                              showFullMessage = !showFullMessage;
+                            });
+                          },
+                          child: Text(
+                            showFullMessage ? 'Show Less' : 'Show More',
+                            style: TextStyle(color: Colors.blue, fontSize: 12),
+                          ),
+                        ),
+                    ],
                   ),
                 ),
               ],
@@ -459,39 +481,95 @@ class _PostState extends State<Post> {
                   .orderBy("CommentTime")
                   .snapshots(),
               builder: (context, snapshot) {
-                // show loading circle if no data yet
                 if (!snapshot.hasData) {
-                  return const Center(
+                  return Center(
                     child: CircularProgressIndicator(),
                   );
                 }
 
-                return ListView(
-                  shrinkWrap: true,
-                  physics: const NeverScrollableScrollPhysics(),
-                  children: snapshot.data!.docs.map((doc) {
-                    // get the comment
-                    final commentData = doc.data() as Map<String, dynamic>;
+                final List<DocumentSnapshot> comments = snapshot.data!.docs;
 
-                    //return the comment
-                    // Check if the required properties are not null
-                    if (commentData["CommentText"] != null &&
-                        commentData["CommentTime"] != null &&
-                        commentData["CommentedBy"] != null) {
-                      return Comment(
+                // Extract first 3 comments
+                List<Widget> initialComments = [];
+                int commentsToShow = comments.length >= 3 ? 3 : comments.length;
+
+                for (int i = 0; i < commentsToShow; i++) {
+                  final commentData =
+                      comments[i].data() as Map<String, dynamic>;
+
+                  // Check if the required properties are not null
+                  if (commentData["CommentText"] != null &&
+                      commentData["CommentTime"] != null &&
+                      commentData["CommentedBy"] != null) {
+                    initialComments.add(
+                      Comment(
                         text: commentData["CommentText"],
                         time: formatDate(commentData["CommentTime"]),
                         user: commentData["CommentedBy"],
                         currentUserEmail: currentUser.email ?? '',
                         onDelete: () {
-                          deleteComment(doc.id);
+                          deleteComment(comments[i].id);
                         },
-                      );
-                    } else {
-                      // Handle the case where data is not as expected
-                      return SizedBox(); // or any other appropriate widget or null
-                    }
-                  }).toList(),
+                      ),
+                    );
+                  } else {
+                    // Handle the case where data is not as expected
+                    initialComments.add(
+                        SizedBox()); // or any other appropriate widget or null
+                  }
+                }
+
+                // Extract remaining comments for the ExpansionTile
+                List<Widget> remainingComments = [];
+                for (int i = 3; i < comments.length; i++) {
+                  final commentData =
+                      comments[i].data() as Map<String, dynamic>;
+
+                  // Check if the required properties are not null
+                  if (commentData["CommentText"] != null &&
+                      commentData["CommentTime"] != null &&
+                      commentData["CommentedBy"] != null) {
+                    remainingComments.add(
+                      Comment(
+                        text: commentData["CommentText"],
+                        time: formatDate(commentData["CommentTime"]),
+                        user: commentData["CommentedBy"],
+                        currentUserEmail: currentUser.email ?? '',
+                        onDelete: () {
+                          deleteComment(comments[i].id);
+                        },
+                      ),
+                    );
+                  } else {
+                    // Handle the case where data is not as expected
+                    remainingComments.add(
+                        SizedBox()); // or any other appropriate widget or null
+                  }
+                }
+
+                return Column(
+                  crossAxisAlignment: CrossAxisAlignment.end,
+                  children: [
+                    // Display first 3 comments outside the ExpansionTile
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.end,
+                      children: initialComments,
+                    ),
+                    if (comments.length > 3)
+                      // Show ExpansionTile if there are more than 3 comments
+                      ExpansionTile(
+                        title: Text(
+                          'Show all comments',
+                          style: TextStyle(fontSize: 12),
+                        ),
+                        children: [
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: remainingComments,
+                          ),
+                        ],
+                      ),
+                  ],
                 );
               },
             ),
