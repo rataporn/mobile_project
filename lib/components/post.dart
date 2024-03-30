@@ -279,19 +279,23 @@ class _PostState extends State<Post> {
                         icon: Icon(Icons.more_vert_outlined),
                         itemBuilder: (context) => [
                           PopupMenuItem(
-                            child: EditButton(
-                              onTap: () {
-                                editPost(widget.message);
-                              },
-                            ),
-                          ),
+                              value: 'edit',
+                              child: EditButton(
+                                onTap: () {},
+                              )),
                           PopupMenuItem(
-                            child: DeleteButton(
-                            onTap: () {
-                              deletePost();
-                            },
-                          )),
+                              value: 'delete',
+                              child: DeleteButton(
+                                onTap: () {},
+                              )),
                         ],
+                        onSelected: (String value) {
+                          if (value == 'edit') {
+                            editPost(widget.message);
+                          } else if (value == 'delete') {
+                            deletePost();
+                          }
+                        },
                       ),
                   ],
                 ),
