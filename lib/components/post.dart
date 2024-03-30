@@ -216,7 +216,7 @@ class _PostState extends State<Post> {
                     .collection("User Posts")
                     .doc(widget.postId)
                     .update({
-                  "message": _editedMessageController.text,
+                  "Message": _editedMessageController.text,
                 }).then((value) {
                   print("Post edited successfully");
                 }).catchError((error) {
@@ -227,7 +227,7 @@ class _PostState extends State<Post> {
               // Dismiss the dialog
               Navigator.pop(context);
             },
-            child: Text("Save Changes"),
+            child: Text("Save"),
           ),
         ],
       ),
