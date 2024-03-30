@@ -1,4 +1,4 @@
-// ignore_for_file: prefer_const_constructors
+// ignore_for_file: prefer_const_constructors, sort_child_properties_last
 
 import 'package:flutter/material.dart';
 
@@ -6,16 +6,22 @@ class Comment extends StatelessWidget {
   final String text;
   final String user;
   final String time;
+  final VoidCallback onDelete;
+  final String? currentUserEmail;
 
   const Comment({
     super.key,
     required this.text,
     required this.time,
     required this.user,
+    required this.onDelete,
+    required this.currentUserEmail,
   });
 
   @override
   Widget build(BuildContext context) {
+    final bool isCurrentUserComment =
+        currentUserEmail != null && user == currentUserEmail!;
     return Container(
       decoration: BoxDecoration(
         color: Colors.blue[100],
@@ -40,6 +46,18 @@ class Comment extends StatelessWidget {
                 time,
                 style: TextStyle(color: Colors.grey[700], fontSize: 10),
               ),
+              SizedBox(
+                width: 5,
+              ),
+              if (isCurrentUserComment)
+                GestureDetector(
+                  child: const Icon(
+                    Icons.delete,
+                    size: 15,
+                    color: Colors.black,
+                  ),
+                  onTap: onDelete,
+                ),
             ],
           ),
           // comment

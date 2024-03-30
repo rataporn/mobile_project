@@ -101,11 +101,17 @@ class _PostState extends State<Post> {
               // clear controller
               _commentTextController.clear();
             },
-            child: Text("Cancel"),
+            child: Text(
+              "Cancel",
+              style: TextStyle(color: Colors.black),
+            ),
           ),
 
           // post button
           TextButton(
+            style: ButtonStyle(
+              backgroundColor: MaterialStateProperty.all<Color>(Colors.blue),
+            ),
             onPressed: () {
               // add comment
               addComment(_commentTextController.text);
@@ -116,7 +122,10 @@ class _PostState extends State<Post> {
               // clear controller
               _commentTextController.clear();
             },
-            child: Text("Post"),
+            child: Text(
+              "Comment",
+              style: TextStyle(color: Colors.white),
+            ),
           ),
         ],
       ),
@@ -135,11 +144,17 @@ class _PostState extends State<Post> {
           // Cancel Button
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: const Text("Cancel"),
+            child: const Text(
+              "Cancel",
+              style: TextStyle(color: Colors.black),
+            ),
           ),
 
           // Delete Button
           TextButton(
+            style: ButtonStyle(
+              backgroundColor: MaterialStateProperty.all<Color>(Colors.red),
+            ),
             onPressed: () async {
               // delete the comment from firestore
               // if you only delete the post, the comment will store in firestore
@@ -169,7 +184,12 @@ class _PostState extends State<Post> {
               // dissmiss the dialog
               Navigator.pop(context);
             },
-            child: const Text("Delete"),
+            child: const Text(
+              "Delete",
+              style: TextStyle(
+                color: Colors.white,
+              ),
+            ),
           )
         ],
       ),
@@ -187,7 +207,7 @@ class _PostState extends State<Post> {
       context: context,
       builder: (context) => AlertDialog(
         title: Text("Edit Post"),
-        contentPadding: EdgeInsets.all(16.0),
+        contentPadding: EdgeInsets.all(20.0),
         content: Container(
           width: 400.0, // Set the width as needed
           child: TextField(
@@ -203,11 +223,17 @@ class _PostState extends State<Post> {
               // Dismiss the dialog
               Navigator.pop(context);
             },
-            child: Text("Cancel"),
+            child: Text(
+              "Cancel",
+              style: TextStyle(color: Colors.black),
+            ),
           ),
 
           // Save changes button
           TextButton(
+            style: ButtonStyle(
+              backgroundColor: MaterialStateProperty.all<Color>(Colors.blue),
+            ),
             onPressed: () {
               // Perform the post edit action
               // For example, update the post message in Firestore
@@ -227,7 +253,58 @@ class _PostState extends State<Post> {
               // Dismiss the dialog
               Navigator.pop(context);
             },
-            child: Text("Save"),
+            child: Text(
+              "Save",
+              style: TextStyle(color: Colors.white),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  // Delete Comment
+  void deleteComment(String commentId) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text("Delete Comment"),
+        content: Text("Are you sure you want to delete this comment?"),
+        actions: [
+          // Cancel button
+          TextButton(
+            onPressed: () {
+              Navigator.pop(context); // Close the dialog
+            },
+            child: Text(
+              "Cancel",
+              style: TextStyle(color: Colors.black),
+            ),
+          ),
+          // Delete button
+          TextButton(
+            style: ButtonStyle(
+              backgroundColor: MaterialStateProperty.all<Color>(Colors.red),
+            ),
+            onPressed: () {
+              // Delete the comment
+              FirebaseFirestore.instance
+                  .collection("User Posts")
+                  .doc(widget.postId)
+                  .collection("Comments")
+                  .doc(commentId)
+                  .delete()
+                  .then((value) {
+                print("Comment deleted");
+              }).catchError((error) {
+                print("Failed to delete comment: $error");
+              });
+              Navigator.pop(context); // Close the dialog
+            },
+            child: Text(
+              "Delete",
+              style: TextStyle(color: Colors.white),
+            ),
           ),
         ],
       ),
@@ -276,7 +353,10 @@ class _PostState extends State<Post> {
                     ),
                     if (widget.user == currentUser.email)
                       PopupMenuButton<String>(
-                        icon: Icon(Icons.more_vert_outlined),
+                        icon: Icon(
+                          Icons.more_vert_outlined,
+                          color: Colors.blue,
+                        ),
                         itemBuilder: (context) => [
                           PopupMenuItem(
                               value: 'edit',
@@ -312,6 +392,9 @@ class _PostState extends State<Post> {
                   ),
                 ),
               ],
+            ),
+            SizedBox(
+              height: 10,
             ),
 
             Row(
@@ -399,6 +482,10 @@ class _PostState extends State<Post> {
                         text: commentData["CommentText"],
                         time: formatDate(commentData["CommentTime"]),
                         user: commentData["CommentedBy"],
+                        currentUserEmail: currentUser.email ?? '',
+                        onDelete: () {
+                          deleteComment(doc.id);
+                        },
                       );
                     } else {
                       // Handle the case where data is not as expected
