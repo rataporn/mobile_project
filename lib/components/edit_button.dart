@@ -2,9 +2,10 @@
 
 import 'package:flutter/material.dart';
 
-class DeleteButton extends StatelessWidget {
-  final void Function()? onTap;
-  const DeleteButton({super.key, required this.onTap});
+class EditButton extends StatelessWidget {
+  final VoidCallback onTap;
+
+  const EditButton({Key? key, required this.onTap}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -13,14 +14,14 @@ class DeleteButton extends StatelessWidget {
         GestureDetector(
           onTap: onTap,
           child: const Icon(
-            Icons.cancel,
+            Icons.edit,
             size: 18,
           ),
         ),
         SizedBox(
           width: 5,
         ),
-        Text('Delete Post')
+        Text('Edit Post')
       ],
     );
   }

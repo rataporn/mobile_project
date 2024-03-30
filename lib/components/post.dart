@@ -1,4 +1,4 @@
-// ignore_for_file: prefer_const_constructors, prefer_const_literals_to_create_immutables
+// ignore_for_file: prefer_const_constructors, prefer_const_literals_to_create_immutables, no_leading_underscores_for_local_identifiers, avoid_print, use_build_context_synchronously, sized_box_for_whitespace
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:twitty/components/comment.dart';
 import 'package:twitty/components/comment_button.dart';
 import 'package:twitty/components/delete_button.dart';
+import 'package:twitty/components/edit_button.dart';
 import 'package:twitty/components/like_button.dart';
 import 'package:twitty/helper/helper_methods.dart';
 
@@ -175,6 +176,64 @@ class _PostState extends State<Post> {
     );
   }
 
+  // Edit Post
+  void editPost(String currentMessage) {
+    // Controller to handle the edited post message
+    TextEditingController _editedMessageController =
+        TextEditingController(text: currentMessage);
+
+    // Show a dialog with a text field for editing the post message
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text("Edit Post"),
+        contentPadding: EdgeInsets.all(16.0),
+        content: Container(
+          width: 400.0, // Set the width as needed
+          child: TextField(
+            controller: _editedMessageController,
+            maxLines: null, // Allow the TextField to expand vertically
+            decoration: InputDecoration(hintText: "Edit your post..."),
+          ),
+        ),
+        actions: [
+          // Cancel button
+          TextButton(
+            onPressed: () {
+              // Dismiss the dialog
+              Navigator.pop(context);
+            },
+            child: Text("Cancel"),
+          ),
+
+          // Save changes button
+          TextButton(
+            onPressed: () {
+              // Perform the post edit action
+              // For example, update the post message in Firestore
+              if (_editedMessageController.text.isNotEmpty) {
+                FirebaseFirestore.instance
+                    .collection("User Posts")
+                    .doc(widget.postId)
+                    .update({
+                  "Message": _editedMessageController.text,
+                }).then((value) {
+                  print("Post edited successfully");
+                }).catchError((error) {
+                  print("Failed to edit post: $error");
+                });
+              }
+
+              // Dismiss the dialog
+              Navigator.pop(context);
+            },
+            child: Text("Save"),
+          ),
+        ],
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return SingleChildScrollView(
@@ -183,8 +242,8 @@ class _PostState extends State<Post> {
           color: Colors.white,
           borderRadius: BorderRadius.circular(8),
         ),
-        margin: EdgeInsets.only(top: 25, left: 25, right: 25),
-        padding: EdgeInsets.all(25),
+        margin: EdgeInsets.only(top: 25, left: 20, right: 20),
+        padding: EdgeInsets.all(15),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -193,6 +252,7 @@ class _PostState extends State<Post> {
               children: [
                 Row(
                   crossAxisAlignment: CrossAxisAlignment.center,
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     // profile pic
                     Container(
@@ -206,18 +266,37 @@ class _PostState extends State<Post> {
                     Expanded(
                       child: Text(
                         widget.user,
-                        style: TextStyle(color: Colors.blue[500]),
+                        style: TextStyle(color: Colors.blue[500], fontSize: 12),
                       ),
                     ),
                     const SizedBox(width: 5),
                     Text(
                       formatDate(widget.time),
-                      style: TextStyle(color: Colors.grey[500], fontSize: 10),
+                      style: TextStyle(color: Colors.grey[500], fontSize: 9),
                     ),
-                    const SizedBox(height: 10),
-                    const SizedBox(width: 10),
                     if (widget.user == currentUser.email)
-                      DeleteButton(onTap: deletePost)
+                      PopupMenuButton<String>(
+                        icon: Icon(Icons.more_vert_outlined),
+                        itemBuilder: (context) => [
+                          PopupMenuItem(
+                              value: 'edit',
+                              child: EditButton(
+                                onTap: () {},
+                              )),
+                          PopupMenuItem(
+                              value: 'delete',
+                              child: DeleteButton(
+                                onTap: () {},
+                              )),
+                        ],
+                        onSelected: (String value) {
+                          if (value == 'edit') {
+                            editPost(widget.message);
+                          } else if (value == 'delete') {
+                            deletePost();
+                          }
+                        },
+                      ),
                   ],
                 ),
               ],
@@ -260,14 +339,31 @@ class _PostState extends State<Post> {
                   width: 5,
                 ),
                 // comment count
-                Text(
-                  // widget.comments.length.toString(),
-                  '3',
-                  style: TextStyle(color: Colors.grey),
+                StreamBuilder<QuerySnapshot>(
+                  stream: FirebaseFirestore.instance
+                      .collection("User Posts")
+                      .doc(widget.postId)
+                      .collection("Comments")
+                      .orderBy("CommentTime")
+                      .snapshots(),
+                  builder: (context, snapshot) {
+                    // show loading circle if no data yet
+                    if (!snapshot.hasData) {
+                      return Text(
+                        '0', // Default to 0 if no comments yet
+                        style: TextStyle(color: Colors.grey),
+                      );
+                    }
+
+                    return Text(
+                      snapshot.data!.docs.length.toString(),
+                      style: TextStyle(color: Colors.grey),
+                    );
+                  },
                 ),
               ],
             ),
-            const SizedBox(
+            SizedBox(
               height: 10,
             ),
 
@@ -286,6 +382,7 @@ class _PostState extends State<Post> {
                     child: CircularProgressIndicator(),
                   );
                 }
+
                 return ListView(
                   shrinkWrap: true,
                   physics: const NeverScrollableScrollPhysics(),

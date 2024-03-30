@@ -48,13 +48,19 @@ class _HomePageState extends State<HomePage> {
     return Scaffold(
       backgroundColor: Colors.blue[100],
       appBar: AppBar(
-        title: Text("The Twitty"),
+        title: Text(
+          "The Twitty",
+          style: TextStyle(color: Colors.white),
+        ),
         backgroundColor: Colors.blue[500],
         actions: [
           // sign out button
           IconButton(
             onPressed: signOut,
-            icon: Icon(Icons.logout),
+            icon: Icon(
+              Icons.logout,
+              color: Colors.white,
+            ),
           )
         ],
       ),
