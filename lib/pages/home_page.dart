@@ -1,10 +1,11 @@
-// ignore_for_file: prefer_const_constructors, prefer_const_literals_to_create_immutables, prefer_interpolation_to_compose_strings
+// ignore_for_file: prefer_const_constructors, prefer_const_literals_to_create_immutables, prefer_interpolation_to_compose_strings, use_build_context_synchronously
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:twitty/components/post.dart';
 import 'package:twitty/components/text_field.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -20,8 +21,19 @@ class _HomePageState extends State<HomePage> {
   // text controller
   final textController = TextEditingController();
   // sign out
-  void signOut() {
-    FirebaseAuth.instance.signOut();
+  void signOut() async {
+    try {
+      if (currentUser.providerData
+          .any((userInfo) => userInfo.providerId == 'google.com')) {
+        await GoogleSignIn().signOut();
+        await FirebaseAuth.instance.signOut();
+        Navigator.of(context).pop();
+      } else {
+        FirebaseAuth.instance.signOut();
+      }
+    } catch (e) {
+      print('Error signing out: $e');
+    }
   }
 
   // post message
@@ -61,7 +73,7 @@ class _HomePageState extends State<HomePage> {
               Icons.logout,
               color: Colors.white,
             ),
-          )
+          ),
         ],
       ),
       body: Center(
@@ -72,7 +84,7 @@ class _HomePageState extends State<HomePage> {
               child: StreamBuilder(
                 stream: FirebaseFirestore.instance
                     .collection("User Posts")
-                    .orderBy("TimeStamp", descending: false)
+                    .orderBy("TimeStamp", descending: true)
                     .snapshots(),
                 builder: (context, snapshot) {
                   if (snapshot.hasData) {
