@@ -3,9 +3,10 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import 'package:twitty/components/post.dart';
-import 'package:twitty/components/text_field.dart';
 import 'package:google_sign_in/google_sign_in.dart';
+import 'package:twitty/components/post_modal.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -18,8 +19,6 @@ class _HomePageState extends State<HomePage> {
   // user
   final currentUser = FirebaseAuth.instance.currentUser!;
 
-  // text controller
-  final textController = TextEditingController();
   // sign out
   void signOut() async {
     try {
@@ -36,114 +35,84 @@ class _HomePageState extends State<HomePage> {
     }
   }
 
-  // post message
-  void postMessage() {
-    // only post if there is something in textfield
-    if (textController.text.isNotEmpty) {
-      // store in firebase
-      FirebaseFirestore.instance.collection("User Posts").add({
-        'UserEmail': currentUser.email,
-        'Message': textController.text,
-        'TimeStamp': Timestamp.now(),
-        'Likes': [],
-      });
-    }
-
-    // clear the textfield
-    setState(() {
-      textController.clear();
-    });
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.blue[100],
       appBar: AppBar(
-        title: Text(
-          "The Twitty",
-          style: TextStyle(color: Colors.white),
-        ),
         backgroundColor: Colors.blue[500],
-        actions: [
-          // sign out button
-          IconButton(
-            onPressed: signOut,
-            icon: Icon(
-              Icons.logout,
-              color: Colors.white,
-            ),
-          ),
-        ],
-      ),
-      body: Center(
-        child: Column(
+        title: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            // the twitty
-            Expanded(
-              child: StreamBuilder(
-                stream: FirebaseFirestore.instance
-                    .collection("User Posts")
-                    .orderBy("TimeStamp", descending: true)
-                    .snapshots(),
-                builder: (context, snapshot) {
-                  if (snapshot.hasData) {
-                    return ListView.builder(
-                      itemCount: snapshot.data!.docs.length,
-                      itemBuilder: (context, index) {
-                        //get the message
-                        final post = snapshot.data!.docs[index];
-                        return Post(
-                          message: post['Message'],
-                          user: post['UserEmail'],
-                          postId: post.id,
-                          likes: List<String>.from(post['Likes'] ?? []),
-                          time: post['TimeStamp'],
-                        );
-                      },
-                    );
-                  } else if (snapshot.hasError) {
-                    return Center(
-                      child: Text('Error:' + snapshot.error.toString()),
-                    );
-                  }
-                  return const Center(
-                    child: CircularProgressIndicator(),
-                  );
-                },
-              ),
-            ),
-
-            // post message
-            Padding(
-              padding: const EdgeInsets.all(25.0),
-              child: Row(
-                children: [
-                  // textfield
-                  Expanded(
-                    child: MyTextField(
-                        controller: textController,
-                        hintText: 'write something..',
-                        obscureText: false),
-                  ),
-
-                  // post buton
-                  IconButton(
-                    onPressed: postMessage,
-                    icon: Icon(Icons.arrow_circle_up),
-                  )
-                ],
-              ),
-            ),
-
-            // logged in as
             Text(
-              "Logged in as: " + currentUser.email!,
-              style: TextStyle(color: Colors.blue),
+              'User: ' + currentUser.email!,
+              style: TextStyle(color: Colors.white, fontSize: 15),
             ),
-            const SizedBox(height: 50),
+
+            // sign out button
+            GestureDetector(
+              onTap: signOut,
+              child: Icon(
+                Icons.logout,
+                color: Colors.white,
+              ),
+            ),
           ],
         ),
+      ),
+      body: Stack(
+        children: [
+          Center(
+            child: StreamBuilder(
+              stream: FirebaseFirestore.instance
+                  .collection("User Posts")
+                  .orderBy("TimeStamp", descending: true)
+                  .snapshots(),
+              builder: (context, snapshot) {
+                if (snapshot.hasData) {
+                  return ListView.builder(
+                    itemCount: snapshot.data!.docs.length,
+                    itemBuilder: (context, index) {
+                      final post = snapshot.data!.docs[index];
+                      return Post(
+                        message: post['Message'],
+                        user: post['UserEmail'],
+                        postId: post.id,
+                        likes: List<String>.from(post['Likes'] ?? []),
+                        time: post['TimeStamp'],
+                      );
+                    },
+                  );
+                } else if (snapshot.hasError) {
+                  return Center(
+                    child: Text('Error:' + snapshot.error.toString()),
+                  );
+                }
+                return Center(
+                  child: CircularProgressIndicator(),
+                );
+              },
+            ),
+          ),
+          Positioned(
+            bottom: 16.0,
+            right: 16.0,
+            child: FloatingActionButton(
+              onPressed: () {
+                showModalBottomSheet(
+                  context: context,
+                  builder: (context) => PostModal(),
+                );
+              },
+              backgroundColor: Colors.blue,
+              child: Icon(
+                Icons.mode_edit,
+                color: Colors.white,
+              ),
+            ),
+          ),
+          const SizedBox(height: 20),
+        ],
       ),
     );
   }
