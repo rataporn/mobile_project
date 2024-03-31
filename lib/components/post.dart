@@ -344,7 +344,7 @@ class _PostState extends State<Post> {
                     Expanded(
                       child: Text(
                         widget.user,
-                        style: TextStyle(color: Colors.blue[500], fontSize: 12),
+                        style: TextStyle(color: Colors.blue[500], fontSize: 13),
                       ),
                     ),
                     const SizedBox(width: 5),

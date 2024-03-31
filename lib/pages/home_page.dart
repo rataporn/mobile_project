@@ -3,6 +3,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import 'package:twitty/components/post.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:twitty/components/post_modal.dart';
@@ -39,21 +40,25 @@ class _HomePageState extends State<HomePage> {
     return Scaffold(
       backgroundColor: Colors.blue[100],
       appBar: AppBar(
-        title: Text(
-          "The Twitty",
-          style: TextStyle(color: Colors.white),
-        ),
         backgroundColor: Colors.blue[500],
-        actions: [
-          // sign out button
-          IconButton(
-            onPressed: signOut,
-            icon: Icon(
-              Icons.logout,
-              color: Colors.white,
+        title: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Text(
+              'User: ' + currentUser.email!,
+              style: TextStyle(color: Colors.white, fontSize: 15),
             ),
-          ),
-        ],
+
+            // sign out button
+            GestureDetector(
+              onTap: signOut,
+              child: Icon(
+                Icons.logout,
+                color: Colors.white,
+              ),
+            ),
+          ],
+        ),
       ),
       body: Stack(
         children: [
@@ -105,23 +110,6 @@ class _HomePageState extends State<HomePage> {
                 color: Colors.white,
               ),
             ),
-          ),
-          // logged in as
-          Row(
-            mainAxisAlignment: MainAxisAlignment.end,
-            children: [
-              Container(
-                margin: EdgeInsets.only(right: 20),
-                decoration: BoxDecoration(color: Colors.white),
-                child: Padding(
-                  padding: const EdgeInsets.all(5.0),
-                  child: Text(
-                    currentUser.email!,
-                    style: TextStyle(color: Colors.blue),
-                  ),
-                ),
-              ),
-            ],
           ),
           const SizedBox(height: 20),
         ],
