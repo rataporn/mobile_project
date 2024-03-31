@@ -4,8 +4,8 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:twitty/components/post.dart';
-import 'package:twitty/components/text_field.dart';
 import 'package:google_sign_in/google_sign_in.dart';
+import 'package:twitty/components/post_modal.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -18,8 +18,6 @@ class _HomePageState extends State<HomePage> {
   // user
   final currentUser = FirebaseAuth.instance.currentUser!;
 
-  // text controller
-  final textController = TextEditingController();
   // sign out
   void signOut() async {
     try {
@@ -34,25 +32,6 @@ class _HomePageState extends State<HomePage> {
     } catch (e) {
       print('Error signing out: $e');
     }
-  }
-
-  // post message
-  void postMessage() {
-    // only post if there is something in textfield
-    if (textController.text.isNotEmpty) {
-      // store in firebase
-      FirebaseFirestore.instance.collection("User Posts").add({
-        'UserEmail': currentUser.email,
-        'Message': textController.text,
-        'TimeStamp': Timestamp.now(),
-        'Likes': [],
-      });
-    }
-
-    // clear the textfield
-    setState(() {
-      textController.clear();
-    });
   }
 
   @override
@@ -76,74 +55,76 @@ class _HomePageState extends State<HomePage> {
           ),
         ],
       ),
-      body: Center(
-        child: Column(
-          children: [
-            // the twitty
-            Expanded(
-              child: StreamBuilder(
-                stream: FirebaseFirestore.instance
-                    .collection("User Posts")
-                    .orderBy("TimeStamp", descending: true)
-                    .snapshots(),
-                builder: (context, snapshot) {
-                  if (snapshot.hasData) {
-                    return ListView.builder(
-                      itemCount: snapshot.data!.docs.length,
-                      itemBuilder: (context, index) {
-                        //get the message
-                        final post = snapshot.data!.docs[index];
-                        return Post(
-                          message: post['Message'],
-                          user: post['UserEmail'],
-                          postId: post.id,
-                          likes: List<String>.from(post['Likes'] ?? []),
-                          time: post['TimeStamp'],
-                        );
-                      },
-                    );
-                  } else if (snapshot.hasError) {
-                    return Center(
-                      child: Text('Error:' + snapshot.error.toString()),
-                    );
-                  }
-                  return const Center(
-                    child: CircularProgressIndicator(),
+      body: Stack(
+        children: [
+          Center(
+            child: StreamBuilder(
+              stream: FirebaseFirestore.instance
+                  .collection("User Posts")
+                  .orderBy("TimeStamp", descending: true)
+                  .snapshots(),
+              builder: (context, snapshot) {
+                if (snapshot.hasData) {
+                  return ListView.builder(
+                    itemCount: snapshot.data!.docs.length,
+                    itemBuilder: (context, index) {
+                      final post = snapshot.data!.docs[index];
+                      return Post(
+                        message: post['Message'],
+                        user: post['UserEmail'],
+                        postId: post.id,
+                        likes: List<String>.from(post['Likes'] ?? []),
+                        time: post['TimeStamp'],
+                      );
+                    },
                   );
-                },
+                } else if (snapshot.hasError) {
+                  return Center(
+                    child: Text('Error:' + snapshot.error.toString()),
+                  );
+                }
+                return Center(
+                  child: CircularProgressIndicator(),
+                );
+              },
+            ),
+          ),
+          Positioned(
+            bottom: 16.0,
+            right: 16.0,
+            child: FloatingActionButton(
+              onPressed: () {
+                showModalBottomSheet(
+                  context: context,
+                  builder: (context) => PostModal(),
+                );
+              },
+              backgroundColor: Colors.blue,
+              child: Icon(
+                Icons.mode_edit,
+                color: Colors.white,
               ),
             ),
-
-            // post message
-            Padding(
-              padding: const EdgeInsets.all(25.0),
-              child: Row(
-                children: [
-                  // textfield
-                  Expanded(
-                    child: MyTextField(
-                        controller: textController,
-                        hintText: 'write something..',
-                        obscureText: false),
+          ),
+          // logged in as
+          Row(
+            mainAxisAlignment: MainAxisAlignment.end,
+            children: [
+              Container(
+                margin: EdgeInsets.only(right: 20),
+                decoration: BoxDecoration(color: Colors.white),
+                child: Padding(
+                  padding: const EdgeInsets.all(5.0),
+                  child: Text(
+                    currentUser.email!,
+                    style: TextStyle(color: Colors.blue),
                   ),
-
-                  // post buton
-                  IconButton(
-                    onPressed: postMessage,
-                    icon: Icon(Icons.arrow_circle_up),
-                  )
-                ],
+                ),
               ),
-            ),
-
-            // logged in as
-            Text(
-              "Logged in as: " + currentUser.email!,
-              style: TextStyle(color: Colors.blue),
-            ),
-            const SizedBox(height: 20),
-          ],
-        ),
+            ],
+          ),
+          const SizedBox(height: 20),
+        ],
       ),
     );
   }
