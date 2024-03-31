@@ -398,8 +398,8 @@ class _PostState extends State<Post> {
                             : widget.message,
                       ),
                       if (widget.message.length > 120)
-                        TextButton(
-                          onPressed: () {
+                        GestureDetector(
+                          onTap: () {
                             setState(() {
                               // Toggle the state to show or hide the full message
                               showFullMessage = !showFullMessage;

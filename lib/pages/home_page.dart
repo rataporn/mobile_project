@@ -141,7 +141,7 @@ class _HomePageState extends State<HomePage> {
               "Logged in as: " + currentUser.email!,
               style: TextStyle(color: Colors.blue),
             ),
-            const SizedBox(height: 50),
+            const SizedBox(height: 20),
           ],
         ),
       ),
