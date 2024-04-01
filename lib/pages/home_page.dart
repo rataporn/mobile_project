@@ -2,9 +2,11 @@
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:twitty/components/post.dart';
 import 'package:twitty/components/text_field.dart';
+import 'package:stylish_bottom_bar/stylish_bottom_bar.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -22,6 +24,15 @@ class _HomePageState extends State<HomePage> {
   // sign out
   void signOut() {
     FirebaseAuth.instance.signOut();
+  }
+
+  int selected = 0;
+  final controller = PageController();
+
+  @override
+  void dispose() {
+    controller.dispose();
+    super.dispose();
   }
 
   // post message
@@ -132,7 +143,76 @@ class _HomePageState extends State<HomePage> {
             const SizedBox(height: 50),
           ],
         ),
+      ),bottomNavigationBar: StylishBottomBar(
+        option: AnimatedBarOptions(
+          iconSize: 32,
+          barAnimation: BarAnimation.fade,
+          iconStyle: IconStyle.animated,
+          opacity: 0.3,
+        ),
+        items: [
+          BottomBarItem(
+            icon: const Icon(
+              Icons.house_outlined,
+            ),
+            selectedIcon: const Icon(Icons.house_rounded),
+            selectedColor: Colors.teal,
+            unSelectedColor: Colors.grey,
+            title: const Text('Home'),
+            // badge: const Text('9+'),
+            showBadge: true,
+            badgeColor: Color.fromARGB(255, 149, 105, 17),
+            badgePadding: const EdgeInsets.only(left: 4, right: 4),
+          ),
+          BottomBarItem(
+            icon: const Icon(Icons.search_outlined),
+            selectedIcon: const Icon(Icons.search_rounded),
+            selectedColor: Color.fromARGB(255, 187, 116, 23),
+            // unSelectedColor: Colors.purple,
+            // backgroundColor: Colors.orange,
+            title: const Text('Search'),
+          ),
+          BottomBarItem(
+              icon: const Icon(
+                Icons.person_outline,
+              ),
+              selectedIcon: const Icon(
+                Icons.person,
+              ),
+              selectedColor: Colors.deepPurple,
+              title: const Text('Profile')),
+          BottomBarItem(
+              icon: const Icon(
+                Icons.settings_outlined
+              ),
+              selectedIcon: const Icon(
+                Icons.settings,
+              ),
+              selectedColor: Colors.deepPurple,
+              title: const Text('Setting')),
+        ],
+        hasNotch: true,
+        fabLocation: StylishBarFabLocation.center,
+        currentIndex: selected,
+        notchStyle: NotchStyle.square,
+        onTap: (index) {
+          if (index == selected) return;
+          controller.jumpToPage(index);
+          setState(() {
+            selected = index;
+          });
+        },
       ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () {
+        },
+        backgroundColor: Colors.white,
+        child: Icon(
+          Icons.add,
+          // color: Colors.red,
+        ),
+      ),
+      floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
     );
   }
 }
