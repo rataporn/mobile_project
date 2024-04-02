@@ -26,7 +26,7 @@ class _PostModalState extends State<PostModal> {
     setState(() {
       textController.clear();
     });
-    Navigator.pop(context); // Close the modal after posting
+    Navigator.pop(context);
   }
 
   @override

@@ -1,5 +1,3 @@
-// ignore_for_file: prefer_const_literals_to_create_immutables, prefer_const_constructors
-
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
@@ -14,14 +12,14 @@ class _ProfilePageState extends State<ProfilePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        appBar: AppBar(
-          backgroundColor: Colors.blue[500],
-        ),
-        body: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-          ProfileImage(),
-          Divider(color: Colors.black),
-          ProfileDetails(),
-        ]));
+        body: Container(
+      margin: EdgeInsets.only(left: 5, right: 5),
+      child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+        ProfileImage(),
+        Divider(color: Colors.black),
+        ProfileDetails(),
+      ]),
+    ));
   }
 }
 

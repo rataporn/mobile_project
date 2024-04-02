@@ -319,8 +319,8 @@ class _PostState extends State<Post> {
         decoration: BoxDecoration(
           color: Colors.white,
         ),
-        margin: EdgeInsets.all(10),
-        // padding: EdgeInsets.all(10),
+        margin: EdgeInsets.only(left: 10, right: 10, top: 10),
+        padding: EdgeInsets.only(left: 10, right: 10),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
