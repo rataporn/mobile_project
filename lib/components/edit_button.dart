@@ -16,12 +16,18 @@ class EditButton extends StatelessWidget {
           child: const Icon(
             Icons.edit,
             size: 18,
+            color: Colors.blue,
           ),
         ),
         SizedBox(
           width: 5,
         ),
-        Text('Edit Post')
+        Text(
+          'Edit',
+          style: TextStyle(
+            color: Colors.blue,
+          ),
+        )
       ],
     );
   }

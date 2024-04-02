@@ -1,6 +1,9 @@
 // return a formatted data as a string
 
 import 'package:cloud_firestore/cloud_firestore.dart';
+// import 'package:firebase_auth/firebase_auth.dart';
+
+
 
 String formatDate(Timestamp timestamp) {
   // Timestamp is the object from firebase
@@ -26,4 +29,10 @@ String formatDate(Timestamp timestamp) {
   String formattedDate = '$day/$month/$year $hour:$minute';
 
   return formattedDate;
+}
+
+const String adminEmail = 'admin@admin.com';
+
+bool isAdmin(String userEmail) {
+  return userEmail == adminEmail;
 }

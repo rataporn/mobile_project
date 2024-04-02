@@ -13,14 +13,18 @@ class DeleteButton extends StatelessWidget {
         GestureDetector(
           onTap: onTap,
           child: const Icon(
-            Icons.cancel,
+            Icons.delete,
             size: 18,
+            color: Colors.red,
           ),
         ),
         SizedBox(
           width: 5,
         ),
-        Text('Delete Post')
+        Text(
+          'Delete',
+          style: TextStyle(color: Colors.red),
+        )
       ],
     );
   }

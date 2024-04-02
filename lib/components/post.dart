@@ -33,6 +33,7 @@ class Post extends StatefulWidget {
 class _PostState extends State<Post> {
   //user
   final currentUser = FirebaseAuth.instance.currentUser!;
+  bool showFullMessage = false;
 
   // coment text controller
   final _commentTextController = TextEditingController();
@@ -101,11 +102,17 @@ class _PostState extends State<Post> {
               // clear controller
               _commentTextController.clear();
             },
-            child: Text("Cancel"),
+            child: Text(
+              "Cancel",
+              style: TextStyle(color: Colors.black),
+            ),
           ),
 
           // post button
           TextButton(
+            style: ButtonStyle(
+              backgroundColor: MaterialStateProperty.all<Color>(Colors.blue),
+            ),
             onPressed: () {
               // add comment
               addComment(_commentTextController.text);
@@ -116,7 +123,10 @@ class _PostState extends State<Post> {
               // clear controller
               _commentTextController.clear();
             },
-            child: Text("Post"),
+            child: Text(
+              "Comment",
+              style: TextStyle(color: Colors.white),
+            ),
           ),
         ],
       ),
@@ -135,11 +145,17 @@ class _PostState extends State<Post> {
           // Cancel Button
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: const Text("Cancel"),
+            child: const Text(
+              "Cancel",
+              style: TextStyle(color: Colors.black),
+            ),
           ),
 
           // Delete Button
           TextButton(
+            style: ButtonStyle(
+              backgroundColor: MaterialStateProperty.all<Color>(Colors.red),
+            ),
             onPressed: () async {
               // delete the comment from firestore
               // if you only delete the post, the comment will store in firestore
@@ -169,7 +185,12 @@ class _PostState extends State<Post> {
               // dissmiss the dialog
               Navigator.pop(context);
             },
-            child: const Text("Delete"),
+            child: const Text(
+              "Delete",
+              style: TextStyle(
+                color: Colors.white,
+              ),
+            ),
           )
         ],
       ),
@@ -187,7 +208,7 @@ class _PostState extends State<Post> {
       context: context,
       builder: (context) => AlertDialog(
         title: Text("Edit Post"),
-        contentPadding: EdgeInsets.all(16.0),
+        contentPadding: EdgeInsets.all(20.0),
         content: Container(
           width: 400.0, // Set the width as needed
           child: TextField(
@@ -203,11 +224,17 @@ class _PostState extends State<Post> {
               // Dismiss the dialog
               Navigator.pop(context);
             },
-            child: Text("Cancel"),
+            child: Text(
+              "Cancel",
+              style: TextStyle(color: Colors.black),
+            ),
           ),
 
           // Save changes button
           TextButton(
+            style: ButtonStyle(
+              backgroundColor: MaterialStateProperty.all<Color>(Colors.blue),
+            ),
             onPressed: () {
               // Perform the post edit action
               // For example, update the post message in Firestore
@@ -227,7 +254,58 @@ class _PostState extends State<Post> {
               // Dismiss the dialog
               Navigator.pop(context);
             },
-            child: Text("Save"),
+            child: Text(
+              "Save",
+              style: TextStyle(color: Colors.white),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  // Delete Comment
+  void deleteComment(String commentId) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text("Delete Comment"),
+        content: Text("Are you sure you want to delete this comment?"),
+        actions: [
+          // Cancel button
+          TextButton(
+            onPressed: () {
+              Navigator.pop(context); // Close the dialog
+            },
+            child: Text(
+              "Cancel",
+              style: TextStyle(color: Colors.black),
+            ),
+          ),
+          // Delete button
+          TextButton(
+            style: ButtonStyle(
+              backgroundColor: MaterialStateProperty.all<Color>(Colors.red),
+            ),
+            onPressed: () {
+              // Delete the comment
+              FirebaseFirestore.instance
+                  .collection("User Posts")
+                  .doc(widget.postId)
+                  .collection("Comments")
+                  .doc(commentId)
+                  .delete()
+                  .then((value) {
+                print("Comment deleted");
+              }).catchError((error) {
+                print("Failed to delete comment: $error");
+              });
+              Navigator.pop(context); // Close the dialog
+            },
+            child: Text(
+              "Delete",
+              style: TextStyle(color: Colors.white),
+            ),
           ),
         ],
       ),
@@ -240,10 +318,9 @@ class _PostState extends State<Post> {
       child: Container(
         decoration: BoxDecoration(
           color: Colors.white,
-          borderRadius: BorderRadius.circular(8),
         ),
-        margin: EdgeInsets.only(top: 25, left: 20, right: 20),
-        padding: EdgeInsets.all(15),
+        margin: EdgeInsets.only(left: 10, right: 10, top: 10),
+        padding: EdgeInsets.only(left: 10, right: 10),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -266,7 +343,8 @@ class _PostState extends State<Post> {
                     Expanded(
                       child: Text(
                         widget.user,
-                        style: TextStyle(color: Colors.blue[500], fontSize: 12),
+                        style: TextStyle(
+                            fontSize: 18, fontWeight: FontWeight.bold),
                       ),
                     ),
                     const SizedBox(width: 5),
@@ -276,7 +354,10 @@ class _PostState extends State<Post> {
                     ),
                     if (widget.user == currentUser.email)
                       PopupMenuButton<String>(
-                        icon: Icon(Icons.more_vert_outlined),
+                        icon: Icon(
+                          Icons.more_horiz,
+                          color: Colors.black,
+                        ),
                         itemBuilder: (context) => [
                           PopupMenuItem(
                               value: 'edit',
@@ -302,16 +383,40 @@ class _PostState extends State<Post> {
               ],
             ),
             Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 const SizedBox(
                   width: 54,
                 ),
                 Expanded(
-                  child: Text(
-                    widget.message,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        widget.message.length > 120 && !showFullMessage
+                            ? widget.message.substring(0, 120) + '...'
+                            : widget.message,
+                      ),
+                      if (widget.message.length > 120)
+                        GestureDetector(
+                          onTap: () {
+                            setState(() {
+                              // Toggle the state to show or hide the full message
+                              showFullMessage = !showFullMessage;
+                            });
+                          },
+                          child: Text(
+                            showFullMessage ? 'Show Less' : 'Show More',
+                            style: TextStyle(color: Colors.blue, fontSize: 12),
+                          ),
+                        ),
+                    ],
                   ),
                 ),
               ],
+            ),
+            SizedBox(
+              height: 10,
             ),
 
             Row(
@@ -376,38 +481,99 @@ class _PostState extends State<Post> {
                   .orderBy("CommentTime")
                   .snapshots(),
               builder: (context, snapshot) {
-                // show loading circle if no data yet
                 if (!snapshot.hasData) {
-                  return const Center(
+                  return Center(
                     child: CircularProgressIndicator(),
                   );
                 }
 
-                return ListView(
-                  shrinkWrap: true,
-                  physics: const NeverScrollableScrollPhysics(),
-                  children: snapshot.data!.docs.map((doc) {
-                    // get the comment
-                    final commentData = doc.data() as Map<String, dynamic>;
+                final List<DocumentSnapshot> comments = snapshot.data!.docs;
 
-                    //return the comment
-                    // Check if the required properties are not null
-                    if (commentData["CommentText"] != null &&
-                        commentData["CommentTime"] != null &&
-                        commentData["CommentedBy"] != null) {
-                      return Comment(
+                // Extract first 3 comments
+                List<Widget> initialComments = [];
+                int commentsToShow = comments.length >= 3 ? 3 : comments.length;
+
+                for (int i = 0; i < commentsToShow; i++) {
+                  final commentData =
+                      comments[i].data() as Map<String, dynamic>;
+
+                  // Check if the required properties are not null
+                  if (commentData["CommentText"] != null &&
+                      commentData["CommentTime"] != null &&
+                      commentData["CommentedBy"] != null) {
+                    initialComments.add(
+                      Comment(
                         text: commentData["CommentText"],
                         time: formatDate(commentData["CommentTime"]),
                         user: commentData["CommentedBy"],
-                      );
-                    } else {
-                      // Handle the case where data is not as expected
-                      return SizedBox(); // or any other appropriate widget or null
-                    }
-                  }).toList(),
+                        currentUserEmail: currentUser.email ?? '',
+                        onDelete: () {
+                          deleteComment(comments[i].id);
+                        },
+                      ),
+                    );
+                  } else {
+                    // Handle the case where data is not as expected
+                    initialComments.add(
+                        SizedBox()); // or any other appropriate widget or null
+                  }
+                }
+
+                // Extract remaining comments for the ExpansionTile
+                List<Widget> remainingComments = [];
+                for (int i = 3; i < comments.length; i++) {
+                  final commentData =
+                      comments[i].data() as Map<String, dynamic>;
+
+                  // Check if the required properties are not null
+                  if (commentData["CommentText"] != null &&
+                      commentData["CommentTime"] != null &&
+                      commentData["CommentedBy"] != null) {
+                    remainingComments.add(
+                      Comment(
+                        text: commentData["CommentText"],
+                        time: formatDate(commentData["CommentTime"]),
+                        user: commentData["CommentedBy"],
+                        currentUserEmail: currentUser.email ?? '',
+                        onDelete: () {
+                          deleteComment(comments[i].id);
+                        },
+                      ),
+                    );
+                  } else {
+                    // Handle the case where data is not as expected
+                    remainingComments.add(
+                        SizedBox()); // or any other appropriate widget or null
+                  }
+                }
+
+                return Column(
+                  crossAxisAlignment: CrossAxisAlignment.end,
+                  children: [
+                    // Display first 3 comments outside the ExpansionTile
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.end,
+                      children: initialComments,
+                    ),
+                    if (comments.length > 3)
+                      // Show ExpansionTile if there are more than 3 comments
+                      ExpansionTile(
+                        title: Text(
+                          'Show all comments',
+                          style: TextStyle(fontSize: 12),
+                        ),
+                        children: [
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: remainingComments,
+                          ),
+                        ],
+                      ),
+                  ],
                 );
               },
             ),
+            Divider(color: Colors.black),
           ],
         ),
       ),
