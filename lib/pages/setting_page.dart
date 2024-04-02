@@ -17,19 +17,19 @@ class SettingsPage extends StatelessWidget {
             },
           ),
           ListTile(
-            title: Text('Notification Settings'),
+            title: Text('Ban word'),
             onTap: () {
               // Navigate to notification settings page
             },
           ),
           ListTile(
-            title: Text('Privacy Settings'),
+            title: Text('Log out'),
             onTap: () {
               // Navigate to privacy settings page
             },
           ),
           ListTile(
-            title: Text('About'),
+            title: Text('Delete account'),
             onTap: () {
               // Navigate to about page
             },
