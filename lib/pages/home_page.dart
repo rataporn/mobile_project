@@ -1,5 +1,3 @@
-// ignore_for_file: prefer_const_constructors, prefer_const_literals_to_create_immutables, prefer_interpolation_to_compose_strings, use_build_context_synchronously
-
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -7,7 +5,7 @@ import 'package:twitty/auth/auth.dart';
 import 'package:twitty/components/post.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:twitty/components/post_modal.dart';
-import 'package:twitty/pages/profile.dart';
+import 'package:twitty/pages/profile_page.dart';
 import 'package:twitty/pages/setting_page.dart';
 import 'package:stylish_bottom_bar/stylish_bottom_bar.dart';
 
@@ -33,7 +31,7 @@ class _HomePageState extends State<HomePage> {
           context,
           MaterialPageRoute(
               builder: (context) =>
-                  AuthPage()), // Replace LoginPage with your login page
+                  AuthPage()),
         );
       } else {
         FirebaseAuth.instance.signOut();
@@ -50,7 +48,7 @@ class _HomePageState extends State<HomePage> {
       case 0:
         return _buildHomeBody();
       case 1:
-        return Container(); // edit to search page
+        return Container();
       case 2:
         return ProfilePage();
       case 3:
@@ -88,7 +86,7 @@ class _HomePageState extends State<HomePage> {
         ),
       ),
       body: _getBodyWidget(
-          selected), // Get the body widget based on the selected index
+          selected),
       bottomNavigationBar: StylishBottomBar(
         option: AnimatedBarOptions(
           iconSize: 32,
