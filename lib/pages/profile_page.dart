@@ -74,9 +74,8 @@ class ProfileDetails extends StatelessWidget {
             '${user?.email}',
             style: TextStyle(fontSize: 25, fontWeight: FontWeight.w600),
           ),
-          SizedBox(height: 20),
+          SizedBox(height: 10),
           _buildFirestoreDataWidget(),
-          SizedBox(height: 20),
         ],
       ),
     );
@@ -93,7 +92,11 @@ class ProfileDetails extends StatelessWidget {
             itemCount: snapshot.data!.docs.length,
             itemBuilder: (context, index) {
               final profile = snapshot.data!.docs[index];
-              return _buildDetailsRow(profile['Description']);
+              return Profile(
+                description: profile['Description'],
+                user: profile.id,
+                time: profile['TimeStamp'],
+              );
             },
           );
         } else if (snapshot.hasError) {
@@ -105,16 +108,92 @@ class ProfileDetails extends StatelessWidget {
       },
     );
   }
+}
 
-  Widget _buildDetailsRow(String value) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          value,
-          overflow: TextOverflow.visible,
+class Profile extends StatelessWidget {
+  final String description;
+  final String user;
+  final Timestamp time;
+
+  const Profile({
+    Key? key,
+    required this.description,
+    required this.user,
+    required this.time,
+  }) : super(key: key);
+
+  void editDescription(
+      BuildContext context, String currentDescription, String userId) {
+    // Controller to handle the edited description
+    TextEditingController _editedDescriptionController =
+        TextEditingController(text: currentDescription);
+
+    // Show a dialog with a text field for editing the description
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text("Edit Description"),
+        contentPadding: EdgeInsets.all(20.0),
+        content: Container(
+          width: 400.0, // Set the width as needed
+          child: TextField(
+            controller: _editedDescriptionController,
+            maxLines: null, // Allow the TextField to expand vertically
+            decoration: InputDecoration(hintText: "Edit your Description..."),
+          ),
         ),
-      ],
+        actions: [
+          // Cancel button
+          TextButton(
+            onPressed: () {
+              // Dismiss the dialog
+              Navigator.pop(context);
+            },
+            child: Text(
+              "Cancel",
+              style: TextStyle(color: Colors.black),
+            ),
+          ),
+
+          // Save changes button
+          TextButton(
+            style: ButtonStyle(
+              backgroundColor: MaterialStateProperty.all<Color>(Colors.blue),
+            ),
+            onPressed: () {
+              // Perform the edit action
+              if (_editedDescriptionController.text.isNotEmpty) {
+                FirebaseFirestore.instance
+                    .collection("User Details")
+                    .doc(
+                        userId) // Use userId to update the specific user's description
+                    .update({
+                  "Description": _editedDescriptionController.text,
+                }).then((value) {
+                  print("Description edited successfully");
+                }).catchError((error) {
+                  print("Failed to edit Description: $error");
+                });
+              }
+
+              // Dismiss the dialog
+              Navigator.pop(context);
+            },
+            child: Text(
+              "Save",
+              style: TextStyle(color: Colors.white),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return ListTile(
+      title: Text(description),
+      onTap: () => editDescription(context, description, user),
     );
   }
 }
