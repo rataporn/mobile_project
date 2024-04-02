@@ -20,8 +20,7 @@ class _SearchPageState extends State<SearchPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: 
-        TextField(
+        title: TextField(
           controller: _searchController,
           decoration: InputDecoration(
             hintText: 'Search...',
