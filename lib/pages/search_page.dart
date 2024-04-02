@@ -9,11 +9,14 @@ class SearchPage extends StatefulWidget {
 
 class _SearchPageState extends State<SearchPage> {
   late TextEditingController _searchController;
+  //late DateTime? _selectedDate;
+  DateTime? _selectedDate;
 
   @override
   void initState() {
     super.initState();
     _searchController = TextEditingController();
+    _selectedDate = null;
   }
 
   @override
@@ -34,9 +37,28 @@ class _SearchPageState extends State<SearchPage> {
             setState(() {});
           },
         ),
+        actions: [
+          IconButton(
+            onPressed: () => _selectDate(context),
+            icon: Icon(Icons.calendar_today),
+          ),
+        ],
       ),
       body: _buildSearchBody(),
     );
+  }
+  Future<void> _selectDate(BuildContext context) async {
+    final DateTime? pickedDate = await showDatePicker(
+      context: context,
+      initialDate: _selectedDate ?? DateTime.now(),
+      firstDate: DateTime(2000),
+      lastDate: DateTime.now(),
+    );
+    if (pickedDate != null && pickedDate != _selectedDate) {
+      setState(() {
+        _selectedDate = pickedDate;
+      });
+    }
   }
 
   Widget _buildSearchBody() {
@@ -78,6 +100,12 @@ class _SearchPageState extends State<SearchPage> {
     final String searchQuery = _searchController.text.toLowerCase();
     return posts.where((post) {
       final String message = post['Message'].toString().toLowerCase();
+      final Timestamp? timeStamp = post['TimeStamp'];
+      final DateTime? postDate = timeStamp?.toDate();
+      bool messageContainsQuery = message.contains(searchQuery);
+      bool dateMatches = postDate != null &&
+          postDate.month == _selectedDate?.month &&
+          postDate.day == _selectedDate?.day;
       return message.contains(searchQuery);
     }).toList();
   }
