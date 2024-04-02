@@ -20,11 +20,13 @@ class _SearchPageState extends State<SearchPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: TextField(
+        title: 
+        TextField(
           controller: _searchController,
           decoration: InputDecoration(
             hintText: 'Search...',
             border: InputBorder.none,
+            prefixIcon: Icon(Icons.search),
             suffixIcon: IconButton(
               onPressed: _searchController.clear,
               icon: Icon(Icons.clear),
