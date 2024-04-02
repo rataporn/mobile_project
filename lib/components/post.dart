@@ -318,10 +318,9 @@ class _PostState extends State<Post> {
       child: Container(
         decoration: BoxDecoration(
           color: Colors.white,
-          borderRadius: BorderRadius.circular(8),
         ),
-        margin: EdgeInsets.only(top: 25, left: 20, right: 20),
-        padding: EdgeInsets.all(20),
+        margin: EdgeInsets.only(left: 10, right: 10, bottom: 10),
+        padding: EdgeInsets.all(10),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -344,7 +343,10 @@ class _PostState extends State<Post> {
                     Expanded(
                       child: Text(
                         widget.user,
-                        style: TextStyle(color: Colors.blue[500], fontSize: 13),
+                        style: TextStyle(
+                            color: Colors.blue[500],
+                            fontSize: 15,
+                            fontWeight: FontWeight.bold),
                       ),
                     ),
                     const SizedBox(width: 5),
@@ -573,6 +575,7 @@ class _PostState extends State<Post> {
                 );
               },
             ),
+            Divider(color: Colors.black),
           ],
         ),
       ),

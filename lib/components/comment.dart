@@ -28,7 +28,7 @@ class Comment extends StatelessWidget {
         borderRadius: BorderRadius.circular(4),
       ),
       margin: const EdgeInsets.only(bottom: 5, left: 50),
-      padding: EdgeInsets.all(10),
+      padding: EdgeInsets.all(8),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -38,7 +38,10 @@ class Comment extends StatelessWidget {
               Expanded(
                 child: Text(
                   user,
-                  style: TextStyle(color: Colors.blue[500], fontSize: 12),
+                  style: TextStyle(
+                      color: Colors.blue[500],
+                      fontSize: 12,
+                      fontWeight: FontWeight.bold),
                 ),
               ),
               Text("  "),

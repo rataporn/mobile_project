@@ -38,15 +38,15 @@ class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.blue[100],
+      backgroundColor: Colors.white,
       appBar: AppBar(
         backgroundColor: Colors.blue[500],
         title: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             Text(
-              'User: ' + currentUser.email!,
-              style: TextStyle(color: Colors.white, fontSize: 15),
+              'Twitty',
+              style: TextStyle(color: Colors.white, fontSize: 20),
             ),
 
             // sign out button

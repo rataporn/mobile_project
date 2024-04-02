@@ -1,25 +1,21 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:twitty/components/text_field.dart';
 import 'package:flutter/material.dart';
+import 'package:twitty/components/text_field.dart';
 
 class PostModal extends StatefulWidget {
-  const PostModal({super.key});
+  const PostModal({Key? key}) : super(key: key);
 
   @override
-  State<PostModal> createState() => _PostModalState();
+  _PostModalState createState() => _PostModalState();
 }
 
 class _PostModalState extends State<PostModal> {
-  // text controller
   final textController = TextEditingController();
   final currentUser = FirebaseAuth.instance.currentUser!;
 
-  // post message
   void postMessage() {
-    // only post if there is something in textfield
     if (textController.text.isNotEmpty) {
-      // store in firebase
       FirebaseFirestore.instance.collection("User Posts").add({
         'UserEmail': currentUser.email,
         'Message': textController.text,
@@ -27,40 +23,60 @@ class _PostModalState extends State<PostModal> {
         'Likes': [],
       });
     }
-
-    // clear the textfield
     setState(() {
       textController.clear();
     });
+    Navigator.pop(context); // Close the modal after posting
   }
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      mainAxisAlignment: MainAxisAlignment.start,
-      children: [
-        Padding(
-          padding: const EdgeInsets.all(25.0),
-          child: Row(
+    return Container(
+      padding: EdgeInsets.all(16),
+      child: Column(
+        children: [
+          Text(
+            currentUser.email!,
+            style: TextStyle(
+              fontWeight: FontWeight.bold,
+              fontSize: 18,
+            ),
+          ),
+          SizedBox(height: 16),
+          MyTextField(
+            controller: textController,
+            hintText: 'Write something...',
+            obscureText: false,
+          ),
+          SizedBox(height: 16),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.end,
             children: [
-              // textfield
-              Expanded(
-                child: MyTextField(
-                  controller: textController,
-                  hintText: 'write something..',
-                  obscureText: false,
+              TextButton(
+                onPressed: () {
+                  Navigator.pop(context);
+                },
+                child: Text(
+                  'Cancel',
+                  style: TextStyle(color: Colors.black),
                 ),
               ),
-
-              // post button
-              IconButton(
+              SizedBox(width: 8),
+              ElevatedButton(
+                style: ButtonStyle(
+                  backgroundColor:
+                      MaterialStateProperty.all<Color>(Colors.blue),
+                ),
                 onPressed: postMessage,
-                icon: Icon(Icons.arrow_circle_up),
+                child: Text('Post',
+                    style: TextStyle(
+                      color: Colors.white,
+                    )),
               ),
             ],
           ),
-        ),
-      ],
+        ],
+      ),
     );
   }
 }
