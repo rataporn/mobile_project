@@ -3,7 +3,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:twitty/components/post.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:twitty/components/post_modal.dart';
@@ -111,7 +110,6 @@ class _HomePageState extends State<HomePage> {
               ),
             ),
           ),
-          const SizedBox(height: 20),
         ],
       ),
     );

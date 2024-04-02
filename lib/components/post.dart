@@ -319,8 +319,8 @@ class _PostState extends State<Post> {
         decoration: BoxDecoration(
           color: Colors.white,
         ),
-        margin: EdgeInsets.only(left: 10, right: 10, bottom: 10),
-        padding: EdgeInsets.all(10),
+        margin: EdgeInsets.all(10),
+        // padding: EdgeInsets.all(10),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -344,9 +344,7 @@ class _PostState extends State<Post> {
                       child: Text(
                         widget.user,
                         style: TextStyle(
-                            color: Colors.blue[500],
-                            fontSize: 15,
-                            fontWeight: FontWeight.bold),
+                            fontSize: 18, fontWeight: FontWeight.bold),
                       ),
                     ),
                     const SizedBox(width: 5),
@@ -357,8 +355,8 @@ class _PostState extends State<Post> {
                     if (widget.user == currentUser.email)
                       PopupMenuButton<String>(
                         icon: Icon(
-                          Icons.more_vert_outlined,
-                          color: Colors.blue,
+                          Icons.more_horiz,
+                          color: Colors.black,
                         ),
                         itemBuilder: (context) => [
                           PopupMenuItem(

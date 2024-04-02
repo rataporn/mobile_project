@@ -35,13 +35,22 @@ class Comment extends StatelessWidget {
           // user, time
           Row(
             children: [
+              Container(
+                decoration:
+                    BoxDecoration(shape: BoxShape.circle, color: Colors.white),
+                // padding: EdgeInsets.all(2),
+                child: const Icon(
+                  Icons.person_2_outlined,
+                  color: Colors.black,
+                ),
+              ),
+              SizedBox(
+                width: 5,
+              ),
               Expanded(
                 child: Text(
                   user,
-                  style: TextStyle(
-                      color: Colors.blue[500],
-                      fontSize: 12,
-                      fontWeight: FontWeight.bold),
+                  style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold),
                 ),
               ),
               Text("  "),
