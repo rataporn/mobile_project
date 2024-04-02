@@ -8,7 +8,6 @@ import 'package:twitty/components/post_modal.dart';
 import 'package:twitty/pages/profile_page.dart';
 import 'package:twitty/pages/search_page.dart';
 import 'package:twitty/pages/setting_page.dart';
-import 'package:twitty/pages/search_page.dart';
 import 'package:stylish_bottom_bar/stylish_bottom_bar.dart';
 
 class HomePage extends StatefulWidget {
