@@ -6,6 +6,7 @@ import 'package:twitty/components/post.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:twitty/components/post_modal.dart';
 import 'package:twitty/pages/profile_page.dart';
+import 'package:twitty/pages/search_page.dart';
 import 'package:twitty/pages/setting_page.dart';
 import 'package:stylish_bottom_bar/stylish_bottom_bar.dart';
 
@@ -29,9 +30,7 @@ class _HomePageState extends State<HomePage> {
         await FirebaseAuth.instance.signOut();
         Navigator.pushReplacement(
           context,
-          MaterialPageRoute(
-              builder: (context) =>
-                  AuthPage()),
+          MaterialPageRoute(builder: (context) => AuthPage()),
         );
       } else {
         FirebaseAuth.instance.signOut();
@@ -48,7 +47,7 @@ class _HomePageState extends State<HomePage> {
       case 0:
         return _buildHomeBody();
       case 1:
-        return Container();
+        return SearchPage();
       case 2:
         return ProfilePage();
       case 3:
@@ -85,8 +84,7 @@ class _HomePageState extends State<HomePage> {
           ],
         ),
       ),
-      body: _getBodyWidget(
-          selected),
+      body: _getBodyWidget(selected),
       bottomNavigationBar: StylishBottomBar(
         option: AnimatedBarOptions(
           iconSize: 32,
