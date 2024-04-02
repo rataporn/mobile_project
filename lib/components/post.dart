@@ -1,5 +1,3 @@
-// ignore_for_file: prefer_const_constructors, prefer_const_literals_to_create_immutables, no_leading_underscores_for_local_identifiers, avoid_print, use_build_context_synchronously, sized_box_for_whitespace
-
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -513,13 +511,13 @@ class _PostState extends State<Post> {
                       ),
                     );
                   } else {
-                    // Handle the case where data is not as expected
+                    
                     initialComments.add(
-                        SizedBox()); // or any other appropriate widget or null
+                        SizedBox()); 
                   }
                 }
 
-                // Extract remaining comments for the ExpansionTile
+               
                 List<Widget> remainingComments = [];
                 for (int i = 3; i < comments.length; i++) {
                   final commentData =
@@ -541,9 +539,8 @@ class _PostState extends State<Post> {
                       ),
                     );
                   } else {
-                    // Handle the case where data is not as expected
                     remainingComments.add(
-                        SizedBox()); // or any other appropriate widget or null
+                        SizedBox());
                   }
                 }
 

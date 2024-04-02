@@ -135,10 +135,10 @@ class Profile extends StatelessWidget {
         title: Text("Edit Description"),
         contentPadding: EdgeInsets.all(20.0),
         content: Container(
-          width: 400.0, // Set the width as needed
+          width: 400.0,
           child: TextField(
             controller: _editedDescriptionController,
-            maxLines: null, // Allow the TextField to expand vertically
+            maxLines: null,
             decoration: InputDecoration(hintText: "Edit your Description..."),
           ),
         ),
@@ -166,7 +166,7 @@ class Profile extends StatelessWidget {
                 FirebaseFirestore.instance
                     .collection("User Details")
                     .doc(
-                        userId) // Use userId to update the specific user's description
+                        userId)
                     .update({
                   "Description": _editedDescriptionController.text,
                 }).then((value) {
