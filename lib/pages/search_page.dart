@@ -25,6 +25,7 @@ class _SearchPageState extends State<SearchPage> {
           decoration: InputDecoration(
             hintText: 'Search...',
             border: InputBorder.none,
+            prefixIcon: Icon(Icons.search),
             suffixIcon: IconButton(
               onPressed: _searchController.clear,
               icon: Icon(Icons.clear),
